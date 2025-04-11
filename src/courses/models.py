@@ -14,15 +14,23 @@ class PublishStatus(models.TextChoices):
     COMING_SOON = "soon", "Coming Soon"
     DRAFT = "draft", "Draft"
 
+def handle_upload(instance,filaname):
+    return f"{filaname}"
 
 class Course(models.Model):
     title = models.CharField(max_length=25)
     description = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to=handle_upload)
     publish_date = models.DateField()
-    access = models.CharField(max_length=25, choices=AccessRequirement.choices)
+    access = models.CharField(max_length=25, choices=AccessRequirement.choices, default= AccessRequirement.ANYONE)
+
+    def __str__(self):
+        return self.title
 
     status = models.CharField(
         max_length=5, choices=PublishStatus.choices, default=PublishStatus.DRAFT
     )
 
-    @property
+    @property 
+    def is_published(self):
+        return self.status == PublishStatus.PUBLISHED
